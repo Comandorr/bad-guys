@@ -164,14 +164,14 @@ class exPlayer(SimpleSprite):
 class SimpleText(sprite.Sprite):
     def __init__(self, text, size, x, y, color = black, background = None):
         super().__init__()
-        self.image = font.Font('F77 Minecraft.ttf', size).render(text, 1, color, background)
+        self.image = font.Font(None, size).render(text, 1, color, background)
         self.position = [x, y]
         self.size = size
         self.color = color
         self.background = background
         self.rect = self.image.get_rect()
     def setText(self, text):
-        self.image = font.Font('F77 Minecraft.ttf', self.size).render(text, 1, self.color, self.background)
+        self.image = font.Font(None, self.size).render(text, 1, self.color, self.background)
         self.rect = self.image.get_rect()
     def reset(self):
         self.rect.x = self.position[0]

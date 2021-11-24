@@ -47,6 +47,8 @@ class Player(SimpleSprite):
         self.speed = speed
         self.direction = 'right'
         self.next_direction = 'right'
+        self.bullets = 3
+        self.rooms = 0
 
     def up(self):
         if self.rect.top > 0 and not sprite.spritecollide(self, walls, False):
@@ -78,8 +80,10 @@ class Player(SimpleSprite):
         if self.x >= win_w:
             new_floor()
             new_walls()
-            new_enemy(5)
+            new_enemy(7)
+            self.bullets = 3
             self.x = 64
+            self.rooms += 1
         for w in walls.sprites():
             if self.rect.colliderect(w.rect):
                 self.x -= self.speed*5
@@ -89,8 +93,9 @@ class Player(SimpleSprite):
     def update(self):
         global TACT, FRAME
         keys = key.get_pressed()
-        if keys[K_SPACE] and FRAME == 29:
+        if keys[K_SPACE] and FRAME == 29 and self.bullets != 0:
             Bullet(player.x-15, player.y-15, player.direction).add(bullets)
+            self.bullets -= 1
         if TACT:
             if keys[K_d] and self.next_direction != 'right':
                 self.next_direction = 'right'
@@ -115,6 +120,9 @@ class Player(SimpleSprite):
             self.left()
         if FRAME == 29:
             self.image = idle[(idle.index(self.image)+1)%len(idle)]
+        if sprite.spritecollide(self, enemies, False):
+            self.x = 64
+            self.y = 128*5
 
     def reset(self):
         self.rect.center = (self.x, self.y)
@@ -195,7 +203,7 @@ def new_enemy(x=1):
 
 new_floor()
 new_walls()
-new_enemy(5)
+new_enemy(7)
 player = Player(idle[0], 0, 128*5)
 mixer.music.load('beat.mp3')
 mixer.music.play(100)
@@ -225,5 +233,16 @@ while run:
         FRAME = 0
     elif FRAME == 5:
         TACT = False
+    bullet_count = SimpleText('патроны: ' + str(player.bullets), 36, 0, 0, background = white)
+    bullet_count.reset()
+    room_count = SimpleText('пройдено комнат: ' + str(player.rooms) + '/10', 36, 0, 40, background = white)
+    room_count.reset()
+    if player.rooms == 10:
+        window.fill(black)
+        final = SimpleText('вы прошли игру', 48, center_x, center_y, color = white)
+        final.position[0] = center_x - final.rect.width/2
+        final.position[1] = center_y - final.rect.height/2
+        final.reset()
+
     display.update()
     clock.tick_busy_loop(60)
